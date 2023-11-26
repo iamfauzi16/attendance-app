@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Attendance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -26,7 +27,7 @@ class AttendanceController extends Controller
      */
     public function create()
     {
-        //
+        return view('attendance.create');
     }
 
     /**
@@ -37,8 +38,32 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validation = $request->validate([
+            'in' => 'required',
+            'note' => 'nullable',
+        ]);
+    
+        $dateIn = now()->format('H:i:s');
+        $dateTime = now('Asia/Jakarta')->format('Y-m-d');
+    
+        $conditionTime = '07:30:00';
+    
+        if (strtotime($dateIn) <= strtotime($conditionTime)) {
+            $attendance = new Attendance;
+            $attendance->user_id = 1;
+            $attendance->status_attendance_id = 1;
+            $attendance->in = $dateIn;
+            $attendance->note = $request->note;
+            $attendance->date_time = $dateTime;
+            $attendance->save();
+    
+            dd($attendance);
+            // return redirect()->route('attendance.index');
+        }
+    
+        return redirect()->route('attendance.create');
     }
+    
 
     /**
      * Display the specified resource.

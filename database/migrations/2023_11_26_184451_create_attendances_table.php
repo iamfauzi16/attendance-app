@@ -17,11 +17,11 @@ class CreateAttendancesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('status_attendance_id');
-            $table->dateTime('in');
-            $table->dateTime('out');
-            $table->longText('note');
-            $table->foreign('status_attendance_id')->references('id')->on('status_attendances')->onDelete('cascade');
+            $table->time('in');
+            $table->time('out')->nullable();
+            $table->longText('note')->nullable();
             $table->date('date_time');
+            $table->foreign('status_attendance_id')->references('id')->on('status_attendances')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

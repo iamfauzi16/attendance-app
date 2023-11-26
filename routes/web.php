@@ -30,6 +30,6 @@ Route::delete('status-attendances/{statusAttendance}', 'StatusAttendanceControll
 
 
 
-
-
 Route::get('attendances', 'AttendanceController@index')->name('attendance.index');
+Route::get('attendances/create', 'AttendanceController@create')->name('attendance.create');
+Route::post('attendances', 'AttendanceController@store')->name('attendance.store');
