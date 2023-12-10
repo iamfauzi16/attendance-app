@@ -13,4 +13,16 @@ class Attendance extends Model
     {
         return $this->belongsTo(StatusAttendance::class);
     }
+
+    public function shiftAttendance()
+    {
+        return $this->belongsTo(ShiftAttendance::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    
 }

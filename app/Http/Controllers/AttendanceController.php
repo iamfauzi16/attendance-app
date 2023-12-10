@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Attendance;
+use App\ShiftAttendance;
+use App\StatusAttendance;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 class AttendanceController extends Controller
 {
@@ -13,9 +17,15 @@ class AttendanceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct() {
+      Auth::user();
+    }
+
     public function index()
     {
-        $attendances = Attendance::get();
+        $user_id = Auth::user()->id;    
+        $attendances = Attendance::where('user_id', $user_id)->get();
 
         return view('attendance.index', compact('attendances'));
     }
@@ -27,8 +37,19 @@ class AttendanceController extends Controller
      */
     public function create()
     {
+        $currentTime = Carbon::now();
+        $startTime = Carbon::today()->setHour(1)->setMinute(0)->setSecond(0);
+        $endTime = Carbon::today()->setHour(6)->setMinute(0)->setSecond(0);
+
+        $isBetween = $currentTime->between($startTime, $endTime);
+
+        if($isBetween) {
+            return view('attention.system-off');
+        }
         return view('attendance.create');
+
     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -38,32 +59,51 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        $validation = $request->validate([
-            'in' => 'required',
-            'note' => 'nullable',
-        ]);
-    
-        $dateIn = now()->format('H:i:s');
-        $dateTime = now('Asia/Jakarta')->format('Y-m-d');
-    
-        $conditionTime = '07:30:00';
-    
-        if (strtotime($dateIn) <= strtotime($conditionTime)) {
+        $dateIn = Carbon::now();
+        $dateTime = $dateIn->format('Y-m-d');
+
+        $user_id = Auth::user()->id;
+
+        // $statusAttendance = StatusAttendance::where('name',['Hadir','Terlambat', 'Ijin'])->first;
+
+        $shiftAttendance = ShiftAttendance::where('user_id', $user_id)->first();
+
+        if($dateIn < Carbon::parse($shiftAttendance->start_time)) {
+        
+        $statusAttendance = StatusAttendance::where('name','Hadir')->first();
+        
+        $attendance = new Attendance;
+
+        $attendance->user_id = $user_id;
+        $attendance->in = $dateIn->format('H:i:s');
+        $attendance->note = $request->note;
+        $attendance->date_time = $dateTime;
+
+        $attendance->status_attendance_id = $statusAttendance->id;
+        $attendance->shift_attendance_id = $shiftAttendance->id;
+        $attendance->save();
+
+        return redirect()->route('attendance.out', $attendance->id);
+
+        } elseif($dateIn > Carbon::parse($shiftAttendance->start_time)->copy()->addMinutes(30) ) {
+            $statusAttendance = StatusAttendance::where('name','Terlambat')->first();
+
             $attendance = new Attendance;
-            $attendance->user_id = 1;
-            $attendance->status_attendance_id = 1;
-            $attendance->in = $dateIn;
+
+            $attendance->user_id = $user_id;
+            $attendance->in = $dateIn->format('H:i:s');
             $attendance->note = $request->note;
             $attendance->date_time = $dateTime;
+    
+            $attendance->status_attendance_id = $statusAttendance->id;
+            $attendance->shift_attendance_id = $shiftAttendance->id;
             $attendance->save();
     
-            dd($attendance);
-            // return redirect()->route('attendance.index');
-        }
-    
-        return redirect()->route('attendance.create');
+            return redirect()->route('attendance.out',$attendance->id);
+
+        } 
     }
-    
+
 
     /**
      * Display the specified resource.
@@ -71,9 +111,9 @@ class AttendanceController extends Controller
      * @param  \App\Attendance  $attendance
      * @return \Illuminate\Http\Response
      */
-    public function show(Attendance $attendance)
+    public function out(Attendance $attendance)
     {
-        //
+        return view('attendance.out', compact('attendance'));
     }
 
     /**
@@ -96,8 +136,46 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, Attendance $attendance)
     {
-        //
+        $dateIn = Carbon::now();
+        $dateTime = $dateIn->format('Y-m-d');
+        $user_id = Auth::user()->id;
+        $shiftAttendance = ShiftAttendance::where('user_id', $user_id)->first();
+    
+        if ($dateIn < Carbon::parse($shiftAttendance->start_time)) {
+            $statusAttendance = StatusAttendance::where('name', 'Hadir')->first();
+    
+            // Menggunakan metode findOrFail dengan ID
+            $attendanceUpdate = Attendance::findOrFail($attendance->id);
+            $attendanceUpdate->user_id = $user_id;
+            $attendanceUpdate->out = $dateIn->format('H:i:s');
+            $attendanceUpdate->note = $request->note;
+            $attendanceUpdate->date_time = $dateTime;
+            $attendanceUpdate->status_attendance_id = $statusAttendance->id;
+            $attendanceUpdate->shift_attendance_id = $shiftAttendance->id;
+            $attendanceUpdate->save();
+    
+            return response()->json($attendanceUpdate);
+    
+        } elseif ($dateIn > Carbon::parse($shiftAttendance->start_time)->copy()->addMinutes(30)) {
+            $statusAttendance = StatusAttendance::where('name', 'Terlambat')->first();
+    
+            // Menggunakan metode findOrFail dengan ID
+            $newAttendance = Attendance::findOrFail($attendance->id);
+            $newAttendance->user_id = $user_id;
+            $newAttendance->in = $dateIn->format('H:i:s');
+            $newAttendance->note = $request->note;
+            $newAttendance->date_time = $dateTime;
+            $newAttendance->status_attendance_id = $statusAttendance->id;
+            $newAttendance->shift_attendance_id = $shiftAttendance->id;
+            $newAttendance->save();
+    
+            return response()->json($newAttendance);
+        }
+    
+        return response()->json(['message' => 'No action taken.']);
     }
+    
+    
 
     /**
      * Remove the specified resource from storage.
