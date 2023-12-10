@@ -136,40 +136,25 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, Attendance $attendance)
     {
+
+        $validation = $request->validate([
+            'out' => 'required'
+        ]);
+
         $dateIn = Carbon::now();
-        $dateTime = $dateIn->format('Y-m-d');
         $user_id = Auth::user()->id;
         $shiftAttendance = ShiftAttendance::where('user_id', $user_id)->first();
     
-        if ($dateIn < Carbon::parse($shiftAttendance->start_time)) {
-            $statusAttendance = StatusAttendance::where('name', 'Hadir')->first();
-    
-            // Menggunakan metode findOrFail dengan ID
+        if ($dateIn <= Carbon::parse($shiftAttendance->end_time)) {
+           
             $attendanceUpdate = Attendance::findOrFail($attendance->id);
             $attendanceUpdate->user_id = $user_id;
             $attendanceUpdate->out = $dateIn->format('H:i:s');
-            $attendanceUpdate->note = $request->note;
-            $attendanceUpdate->date_time = $dateTime;
-            $attendanceUpdate->status_attendance_id = $statusAttendance->id;
-            $attendanceUpdate->shift_attendance_id = $shiftAttendance->id;
+          
             $attendanceUpdate->save();
     
             return response()->json($attendanceUpdate);
     
-        } elseif ($dateIn > Carbon::parse($shiftAttendance->start_time)->copy()->addMinutes(30)) {
-            $statusAttendance = StatusAttendance::where('name', 'Terlambat')->first();
-    
-            // Menggunakan metode findOrFail dengan ID
-            $newAttendance = Attendance::findOrFail($attendance->id);
-            $newAttendance->user_id = $user_id;
-            $newAttendance->in = $dateIn->format('H:i:s');
-            $newAttendance->note = $request->note;
-            $newAttendance->date_time = $dateTime;
-            $newAttendance->status_attendance_id = $statusAttendance->id;
-            $newAttendance->shift_attendance_id = $shiftAttendance->id;
-            $newAttendance->save();
-    
-            return response()->json($newAttendance);
         }
     
         return response()->json(['message' => 'No action taken.']);
