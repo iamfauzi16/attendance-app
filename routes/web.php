@@ -38,6 +38,19 @@ Route::middleware(['auth'])->group(function() {
     Route::get('attendances/{attendance}/out', 'AttendanceController@out')->name('attendance.out');
     Route::put('attendances/{attendance}', 'AttendanceController@update')->name('attendance.update');
 
+    Route::get('shift-attendances', 'ShiftAttendanceController@index')->name('shift-attendance.index');
+    Route::get('shift-attendances/create', 'ShiftAttendanceController@create')->name('shift-attendance.create');
+    Route::post('shift-attendances', 'ShiftAttendanceController@store')->name('shift-attendance.store');
+    Route::get('shift-attendances/show/{shiftAttendance}', 'ShiftAttendanceController@show')->name('shift-attendance.show');
+    Route::get('shift-attendances/{shiftAttendance}/edit', 'ShiftAttendanceController@edit')->name('shift-attendance.edit');
+    Route::put('shift-attendances/{shiftAttendance}', 'ShiftAttendanceController@update')->name('shift-attendance.update');
+
+
+    Route::delete('shift-attendances/{shiftAttendance}', 'ShiftAttendanceController@destroy')->name('shift-attendance.destroy');
+
+
+
+
     
 });
 

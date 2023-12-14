@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\StatusAttendance;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class StatusAttendanceController extends Controller
 {
@@ -38,15 +39,15 @@ class StatusAttendanceController extends Controller
     public function store(Request $request)
     {
         $validation = $request->validate([
-            'name' => 'nullable',
-            'detail_status' => 'nullable'
+            'name' => 'required',
+            'detail_status' => 'required'
         ]);
 
         StatusAttendance::create($validation);
 
-        dd($validation);
+        Alert::success('Sucess Title', 'Data berhasil ditambahkan!');
 
-        // return redirect()->route('status-attendance.create')->with('status', 'Data Berhasil Ditambahkan');
+        return redirect()->route('status-attendance.create');
     }
 
     /**

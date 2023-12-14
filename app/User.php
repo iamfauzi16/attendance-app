@@ -41,4 +41,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Attendance::class);
     }
+    
+    public function shiftAttendance()
+    {
+        return $this->hasMany(ShiftAttendance::class);
+    }
 }
