@@ -1,42 +1,43 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Statu Attendance')
-
-@section('header', 'Status Attendance')
+@section('title', 'Management App | Logo App')
+@section('header', 'Management Logo App')
 
 @section('content')
-
     <div>
         <div class="card mt-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <a href="{{ route('status-attendance.create') }}" class="btn btn-sm btn-success mb-4">Tambah Status</a>
+                    <a href="{{ route('shift-attendance.create') }}" class="btn btn-sm btn-success mb-4">Tambah Shift</a>
                     <table class="table table-striped table-hover" id="myTable">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Jenis Status</th>
-                                <th scope="col">Detail Status</th>
+                                <th scope="col">Nama User</th>
+                                <th scope="col">Nama Shift</th>
+                                <th scope="col">Start Time</th>
+                                <th scope="col">End Time</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($statusAttendances as $statusAttendance)
+                            @foreach ($shiftAttendances as $shiftAttendance)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $statusAttendance->name }}</td>
-                                    <td>{{ $statusAttendance->detail_status }}</td>
-                                    <td class="d-flex">
-                                        <a href="{{ route('status-attendance.show', $statusAttendance) }}"
+                                    <td>{{ $shiftAttendance->user->name }}</td>
+                                    <td>{{ $shiftAttendance->name_shift }}</td>
+                                    <td>{{ $shiftAttendance->start_time }}</td>
+                                    <td>{{ $shiftAttendance->end_time }}</td>
+                                    <td class="d-flex gap-2">
+                                        <a href="{{ route('shift-attendance.show', $shiftAttendance) }}"
                                             class="btn btn-sm btn-warning">Show</a>
-                                        <a href="{{ route('status-attendance.edit', $statusAttendance) }}"
+                                        <a href="{{ route('shift-attendance.edit', $shiftAttendance) }}"
                                             class="btn btn-sm btn-success">Edit</a>
-                                        <form action="{{ route('status-attendance.destroy', $statusAttendance) }}"
+                                        <form action="{{ route('shift-attendance.destroy', $shiftAttendance) }}"
                                             method="POST">
                                             @method('DELETE')
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-
                                         </form>
                                     </td>
                                 </tr>
@@ -47,14 +48,13 @@
             </div>
         </div>
     </div>
-@endsection
 
+@endsection
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}" />
 @endpush
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
     <script src="{{ asset('js/datatables.min.js') }}"></script>
     <script>
         let table = new DataTable('#myTable');

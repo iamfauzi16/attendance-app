@@ -37,6 +37,8 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('attendances/{attendance}/out', 'AttendanceController@out')->name('attendance.out');
     Route::put('attendances/{attendance}', 'AttendanceController@update')->name('attendance.update');
+    Route::delete('attendances/{attendance}', 'AttendanceController@destroy')->name('attendance.destroy');
+
 
     Route::get('shift-attendances', 'ShiftAttendanceController@index')->name('shift-attendance.index');
     Route::get('shift-attendances/create', 'ShiftAttendanceController@create')->name('shift-attendance.create');
@@ -48,8 +50,7 @@ Route::middleware(['auth'])->group(function() {
 
     Route::delete('shift-attendances/{shiftAttendance}', 'ShiftAttendanceController@destroy')->name('shift-attendance.destroy');
 
-
-
+    Route::get('managements/logo', 'LogoAppController@index')->name('management-app.logo.index');
 
     
 });

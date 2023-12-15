@@ -1,50 +1,74 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Attendance Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Attendance Form</div>
+@extends('layouts.dashboard')
 
-                    <div class="card-body">
-                        @if(session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
+@section('title', 'Attendance | Check Out')
+@section('header', 'Attendance Check Out')
 
-                        <form method="post" action="{{ route('attendance.update', $attendance->id) }}">
-                            @method('PUT')
-                            @csrf
-                            <div class="mb-3">
-                              <label for="in" class="form-label">Time In:</label>
-                              <input type="text" name="out" class="form-control" value="{{ $attendance->in }}" readonly>
-                          </div>
-                            <div class="mb-3">
-                                <label for="in" class="form-label">Time Out:</label>
-                                <input type="text" name="out" class="form-control" value="{{ now()->format('H:i:s') }}" readonly>
-                            </div>
+@section('content')
+<div>
+    <div class="row justify-content-start">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Attendance Form</div>
 
-                            <div class="mb-3">
-                                <label for="note" class="form-label">Note:</label>
-                                <textarea name="note" class="form-control" rows="3">{{ old('note') }}</textarea>
-                            </div>
+                <div class="card-body">
+                    <form method="post" action="{{ route('attendance.update', $attendance->id) }}">
+                        @method('PUT')
+                        @csrf
+                        <p>Time</p>
+                        <div class="time border rounded mb-3 justify-content-center" name="in">
+                            <p id="hour"></p>
+                            <p id="minute"></p>
+                            <p id="second"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="in" class="form-label">Time In:</label>
+                            <input type="text" name="out" class="form-control" value="{{ $attendance->in }}"
+                                readonly>
+                        </div>
+                       
+                        <div class="mb-3">
+                            <label for="note" class="form-label">Note <span>(Optional)</span></label>
+                            <textarea name="note" class="form-control" rows="3">{{ old('note') }}</textarea>
+                        </div>
 
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Check Out</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div> 
+@endsection
+   
+@push('styles')
+<style>
+    .time {
+        display: flex;
+        gap: 3rem;
+        width: 200px;
+       
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</body>
-</html>
+    #hour,
+    #minute,
+    #second {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+</style>
+
+@endpush
+@push('scripts')
+    <script>
+        window.setTimeout("waktu()", 1000);
+
+        function waktu(){
+            var waktu = new Date();
+            setTimeout("waktu()", 1000);
+            document.getElementById("hour").innerHTML = waktu.getHours();
+            document.getElementById("minute").innerHTML = waktu.getMinutes();
+            document.getElementById("second").innerHTML = waktu.getSeconds();
+        }
+    </script>
+@endpush

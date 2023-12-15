@@ -8,6 +8,7 @@ use App\ShiftAttendance;
 use App\StatusAttendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 
 class AttendanceController extends Controller
@@ -37,6 +38,7 @@ class AttendanceController extends Controller
      */
     public function create()
     {
+
         $currentTime = Carbon::now();
         $startTime = Carbon::today()->setHour(1)->setMinute(0)->setSecond(0);
         $endTime = Carbon::today()->setHour(6)->setMinute(0)->setSecond(0);
@@ -82,7 +84,7 @@ class AttendanceController extends Controller
         $attendance->status_attendance_id = $statusAttendance->id;
         $attendance->shift_attendance_id = $shiftAttendance->id;
         $attendance->save();
-
+        Alert::success('Success','Kamu Berhasil Absen Masuk');
         return redirect()->route('attendance.out', $attendance->id);
 
         } elseif($dateIn > Carbon::parse($shiftAttendance->start_time)->copy()->addMinutes(30) ) {
@@ -98,6 +100,7 @@ class AttendanceController extends Controller
             $attendance->status_attendance_id = $statusAttendance->id;
             $attendance->shift_attendance_id = $shiftAttendance->id;
             $attendance->save();
+            Alert::success('Success','Kamu Berhasil Absen Masuk');
     
             return redirect()->route('attendance.out',$attendance->id);
 
@@ -141,12 +144,12 @@ class AttendanceController extends Controller
             $attendanceUpdate->out = $dateIn->format('H:i:s');
           
             $attendanceUpdate->save();
+            Alert::success('Success','Kamu Berhasil Absen Keluar');
     
-            return response()->json($attendanceUpdate);
+            return redirect()->route('attendance.index');
     
         }
     
-        return response()->json(['message' => 'No action taken.']);
     }
     
     
@@ -159,6 +162,8 @@ class AttendanceController extends Controller
      */
     public function destroy(Attendance $attendance)
     {
-        //
+        $attendance->delete();
+
+        return back();
     }
 }

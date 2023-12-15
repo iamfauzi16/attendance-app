@@ -1,9 +1,11 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
+@section('title', 'Attendance | Home')
+@section('header', 'Attendance Home')
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+<div>
+    <div class="row justify-content-start">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">Dashboard</div>
 
