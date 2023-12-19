@@ -15,8 +15,8 @@ class StatusAttendanceTableSeeder extends Seeder
     public function run()
     {
         DB::table('status_attendances')->insert([
-            'name' => 'Masuk',
-            'detail_status' => 'Masuk'
+            'name' => 'Hadir',
+            'detail_status' => 'Hadir'
         ]);
     }
 }

@@ -9,7 +9,9 @@
     <div class="card mt-4">
         <div class="card-body">
             <div>
-                <a href="{{ route('attendance.create') }}" class="btn btn-sm btn-success mb-4">Tambah Attendance</a>
+             
+                <a href="{{ route('attendance.create') }}" class="btn btn-sm btn-success mb-4 d-none">Check In</a> 
+               
                 <table class="table table-striped table-hover" id="myTable">
                     <thead>
                         <tr>

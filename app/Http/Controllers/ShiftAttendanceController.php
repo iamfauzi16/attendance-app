@@ -5,10 +5,17 @@ namespace App\Http\Controllers;
 use App\User;
 use App\ShiftAttendance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ShiftAttendanceController extends Controller
 {
+
+    public function __construct()
+    {
+        Auth::user();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,8 +23,8 @@ class ShiftAttendanceController extends Controller
      */
     public function index()
     {
-        $shiftAttendances = ShiftAttendance::all();
-
+        $shiftAttendances = ShiftAttendance::where('user_id', Auth::user()->id)->get();
+       
         return view('shift-attendance.index', compact('shiftAttendances'));
     }
 
@@ -31,6 +38,7 @@ class ShiftAttendanceController extends Controller
         $users = User::all();
         return view('shift-attendance.create', compact('users'));
     }
+
 
     /**
      * Store a newly created resource in storage.

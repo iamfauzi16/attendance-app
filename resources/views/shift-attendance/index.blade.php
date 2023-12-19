@@ -8,7 +8,9 @@
         <div class="card mt-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <a href="{{ route('shift-attendance.create') }}" class="btn btn-sm btn-success mb-4">Tambah Shift</a>
+                    @if(Auth::user()->role == 'admin')
+                        <a href="{{ route('shift-attendance.create') }}" class="btn btn-sm btn-success mb-4">Tambah Shift</a>
+                    @endif
                     <table class="table table-striped table-hover" id="myTable">
                         <thead>
                             <tr>

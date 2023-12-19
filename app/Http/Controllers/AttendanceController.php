@@ -31,6 +31,8 @@ class AttendanceController extends Controller
         return view('attendance.index', compact('attendances'));
     }
 
+    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -38,21 +40,20 @@ class AttendanceController extends Controller
      */
     public function create()
     {
-
         $currentTime = Carbon::now();
         $startTime = Carbon::today()->setHour(1)->setMinute(0)->setSecond(0);
         $endTime = Carbon::today()->setHour(6)->setMinute(0)->setSecond(0);
 
         $isBetween = $currentTime->between($startTime, $endTime);
-
         if($isBetween) {
             return view('attention.system-off');
         }
         return view('attendance.create');
 
     }
+   
     
-
+    
     /**
      * Store a newly created resource in storage.
      *
@@ -69,12 +70,25 @@ class AttendanceController extends Controller
         // $statusAttendance = StatusAttendance::where('name',['Hadir','Terlambat', 'Ijin'])->first;
 
         $shiftAttendance = ShiftAttendance::where('user_id', $user_id)->first();
+        if(!$shiftAttendance) {
+            return response()->view('error.400', [], 400);
+        }
 
+        $attendanceValidation = Attendance::get()->first();
+
+        $attendance = new Attendance;
+
+        if($attendanceValidation) {
+            Alert::warning('Warning','Kamu Sudah Melakukan Absen');
+            return redirect()->route('attendance.create');
+        }
         if($dateIn < Carbon::parse($shiftAttendance->start_time)) {
         
         $statusAttendance = StatusAttendance::where('name','Hadir')->first();
-        
-        $attendance = new Attendance;
+
+        if(!$statusAttendance) {
+            return response()->view('error.400',[], 400);
+        }
 
         $attendance->user_id = $user_id;
         $attendance->in = $dateIn->format('H:i:s');
@@ -88,7 +102,12 @@ class AttendanceController extends Controller
         return redirect()->route('attendance.out', $attendance->id);
 
         } elseif($dateIn > Carbon::parse($shiftAttendance->start_time)->copy()->addMinutes(30) ) {
+            
             $statusAttendance = StatusAttendance::where('name','Terlambat')->first();
+
+            if(!$statusAttendance) {
+                return response()->view('error.400',[], 400);
+            }
 
             $attendance = new Attendance;
 
@@ -100,7 +119,7 @@ class AttendanceController extends Controller
             $attendance->status_attendance_id = $statusAttendance->id;
             $attendance->shift_attendance_id = $shiftAttendance->id;
             $attendance->save();
-            Alert::success('Success','Kamu Berhasil Absen Masuk');
+            Alert::success('Success','Kamu berhasil absen masuk');
     
             return redirect()->route('attendance.out',$attendance->id);
 
@@ -119,6 +138,7 @@ class AttendanceController extends Controller
         return view('attendance.out', compact('attendance'));
     }
 
+   
     /**
      * Update the specified resource in storage.
      *
@@ -135,16 +155,21 @@ class AttendanceController extends Controller
 
         $dateIn = Carbon::now();
         $user_id = Auth::user()->id;
+        $attendanceUpdate = Attendance::findOrFail($attendance->id);
+
         $shiftAttendance = ShiftAttendance::where('user_id', $user_id)->first();
-    
+        if(!$attendanceUpdate) {
+            Alert::warning('Warning', 'Sudah absen Keluar!');
+            return redirect()->route('attendance.index');
+        }
+
         if ($dateIn <= Carbon::parse($shiftAttendance->end_time)) {
            
-            $attendanceUpdate = Attendance::findOrFail($attendance->id);
             $attendanceUpdate->user_id = $user_id;
             $attendanceUpdate->out = $dateIn->format('H:i:s');
           
             $attendanceUpdate->save();
-            Alert::success('Success','Kamu Berhasil Absen Keluar');
+            Alert::success('Success','Kamu berhasil absen keluar');
     
             return redirect()->route('attendance.index');
     
@@ -152,8 +177,6 @@ class AttendanceController extends Controller
     
     }
     
-    
-
     /**
      * Remove the specified resource from storage.
      *
@@ -165,5 +188,16 @@ class AttendanceController extends Controller
         $attendance->delete();
 
         return back();
+    }
+
+    public function nyoba()
+    {
+       $attendanceFind = Attendance::latest('in')->first();
+       if(!$attendanceFind) {
+        Alert::warning('Warning', 'Lakukan absen masuk terlebih dahulu!');
+
+        return redirect()->route('attendance.create');
+       }
+        return view('attendance.create-out', compact('attendanceFind'));
     }
 }

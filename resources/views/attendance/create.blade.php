@@ -5,12 +5,14 @@
 @section('header', 'Attendance Check In')
 
 @section('content')
+
 <div>
     <div class="row justify-content-start">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">Attendance Form</div>
                 <div class="card-body">
+                   
                     <form method="post" action="{{ route('attendance.store') }}">
                         @csrf
                         <p>Time</p>
@@ -27,11 +29,14 @@
 
                         <button type="submit" class="btn btn-primary">Check In</button>
                     </form>
+                    
+                    
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
 @push('styles')
 <style>

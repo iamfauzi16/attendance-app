@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AttendanceController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth'])->group(function() {
+Route::middleware(CheckRole::class)->group(function() {
     Route::get('status-attendances', 'StatusAttendanceController@index')->name('status-attendance.index');
     Route::get('status-attendances/create', 'StatusAttendanceController@create')->name('status-attendance.create');
     Route::get('status-attendances/show/{statusAttendance}', 'StatusAttendanceController@show')->name('status-attendance.show');
@@ -32,9 +33,11 @@ Route::middleware(['auth'])->group(function() {
     
     
     Route::get('attendances', 'AttendanceController@index')->name('attendance.index');
-    Route::get('attendances/in', 'AttendanceController@create')->name('attendance.create');
-    Route::post('attendances', 'AttendanceController@store')->name('attendance.store');
+    Route::get('attendances/check-in', 'AttendanceController@create')->name('attendance.create');
+  
+    Route::get('attendances/check-out', 'AttendanceController@nyoba');
 
+    Route::post('attendances', 'AttendanceController@store')->name('attendance.store');
     Route::get('attendances/{attendance}/out', 'AttendanceController@out')->name('attendance.out');
     Route::put('attendances/{attendance}', 'AttendanceController@update')->name('attendance.update');
     Route::delete('attendances/{attendance}', 'AttendanceController@destroy')->name('attendance.destroy');

@@ -16,7 +16,7 @@ class ShiftAttendanceTableSeeder extends Seeder
             'user_id' => 1,
             'name_shift' => 'Shift Pagi',
             'start_time' => '07:30:00',
-            'end_time' => '07:30:00'
+            'end_time' => '16:00:00'
 
         ]);
     }
